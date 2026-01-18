@@ -4,16 +4,35 @@ import { OfficeCard } from './OfficeCard';
 import { useLanguage } from '../lib/LanguageContext';
 
 interface SmartSuggestionsProps {
-  onSelectOffice: (officeId: string, officeData?: {
+  onSelectOffice: (officeId: string | null, officeData?: {
     nextAvailable: string;
     availableSlots: number;
     name: string;
     address: string;
-  }) => void;
+  } | null) => void;
 }
 
 export function SmartSuggestions({ onSelectOffice }: SmartSuggestionsProps) {
   const { t } = useLanguage();
+
+  // Helper to get actual date from relative label
+  const getActualDate = (relativeDate: string): string => {
+    const today = new Date();
+    if (relativeDate.toLowerCase().includes('today') || relativeDate.toLowerCase().includes('heute')) {
+      return today.toISOString().split('T')[0];
+    } else if (relativeDate.toLowerCase().includes('tomorrow') || relativeDate.toLowerCase().includes('morgen')) {
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      return tomorrow.toISOString().split('T')[0];
+    }
+    return today.toISOString().split('T')[0];
+  };
+
+  // Helper to format date for display
+  const formatDateDisplay = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
+  };
 
   const suggestedOffices = [
     {
@@ -73,6 +92,7 @@ export function SmartSuggestions({ onSelectOffice }: SmartSuggestionsProps) {
             className="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer"
             onClick={() => onSelectOffice(office.id, {
               nextAvailable: office.nextAvailable,
+              nextAvailableDate: getActualDate(office.nextAvailable),
               availableSlots: office.availableSlots,
               name: office.name,
               address: office.address
@@ -96,7 +116,7 @@ export function SmartSuggestions({ onSelectOffice }: SmartSuggestionsProps) {
               
               <div className="flex items-center gap-2 text-green-700 font-medium">
                 <Calendar className="w-4 h-4" />
-                <span>{office.nextAvailable}</span>
+                <span>{office.nextAvailable} ({formatDateDisplay(getActualDate(office.nextAvailable))})</span>
               </div>
               
               <div className="flex items-center justify-between pt-2 border-t border-blue-100">

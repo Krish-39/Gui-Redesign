@@ -2,8 +2,18 @@ import React, { useState } from 'react';
 import { useLanguage } from '../../lib/LanguageContext';
 import { User, Home, Calendar, Upload, FileText } from 'lucide-react';
 
+export interface RegistrationData {
+  firstName: string;
+  lastName: string;
+  birthDate: string;
+  birthPlace: string;
+  nationality: string;
+  previousStreet: string;
+  [key: string]: string;
+}
+
 interface OnlineRegistrationProps {
-  onSubmit: (formData: any) => void;
+  onSubmit: (formData: RegistrationData) => void;
 }
 
 export function OnlineRegistration({ onSubmit }: OnlineRegistrationProps) {

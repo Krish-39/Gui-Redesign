@@ -15,7 +15,7 @@ export function DecisionHub({ onSelectPath }: DecisionHubProps) {
     {
       id: 'appointment',
       icon: <Calendar className="w-full h-full" />,
-      iconBgColor: '#E60032', // Official Berlin Red
+      iconBgColor: '#d82020', // Official Berlin Red
       headline: t.decisionHub.appointmentTitle,
       description: t.decisionHub.appointmentDescription,
       ctaLabel: language === 'de' ? 'Termin buchen' : 'Book now',
@@ -27,7 +27,7 @@ export function DecisionHub({ onSelectPath }: DecisionHubProps) {
     {
       id: 'online',
       icon: <Monitor className="w-full h-full" />,
-      iconBgColor: '#002A4E', // Official Berlin Blue
+      iconBgColor: '#003063', // Official Berlin Blue
       headline: t.decisionHub.onlineTitle,
       description: t.decisionHub.onlineDescription,
       ctaLabel: language === 'de' ? 'Online starten' : 'Start online',
@@ -44,7 +44,7 @@ export function DecisionHub({ onSelectPath }: DecisionHubProps) {
         <h1 style={{ color: '#000000' }}>
           {language === 'de' ? 'Wie möchten Sie sich anmelden?' : 'How would you like to register?'}
         </h1>
-        <p className="text-lg mt-4 max-w-2xl mx-auto" style={{ color: '#333333' }}>
+        <p className="text-lg mt-4 max-w-6xl mx-auto" style={{ color: '#333333' }}>
           {language === 'de'
             ? 'Wählen Sie die für Sie passende Methode zur Anmeldung Ihrer Wohnung in Berlin.'
             : 'Choose the registration method that works best for you.'}
@@ -58,8 +58,8 @@ export function DecisionHub({ onSelectPath }: DecisionHubProps) {
       <div 
         className="mt-12 rounded-lg p-6 border"
         style={{ 
-          backgroundColor: 'rgba(0, 42, 78, 0.05)',
-          borderColor: '#002A4E'
+          backgroundColor: 'rgba(0, 48, 99, 0.05)',
+          borderColor: '#003063'
         }}
       >
         <h3 className="text-lg font-semibold mb-3" style={{ color: '#000000' }}>
@@ -67,7 +67,7 @@ export function DecisionHub({ onSelectPath }: DecisionHubProps) {
         </h3>
         <ul className="space-y-2 text-sm" style={{ color: '#333333' }}>
           <li className="flex items-start gap-2">
-            <span style={{ color: '#007256' }} className="mt-1">✓</span>
+            <span style={{ color: '#5cb85c' }} className="mt-1">✓</span>
             <span>
               {language === 'de'
                 ? 'Personalausweis oder Reisepass'
@@ -75,15 +75,15 @@ export function DecisionHub({ onSelectPath }: DecisionHubProps) {
             </span>
           </li>
           <li className="flex items-start gap-2">
-            <span style={{ color: '#007256' }} className="mt-1">✓</span>
+            <span style={{ color: '#5cb85c' }} className="mt-1">✓</span>
             <span>
               {language === 'de'
-                ? 'Wohnungsgeberbestätigung (vom Vermieter unterschrieben)'
+                ? 'Wohnungsgeberätätigung (vom Vermieter unterschrieben)'
                 : 'Landlord confirmation (signed)'}
             </span>
           </li>
           <li className="flex items-start gap-2">
-            <span style={{ color: '#007256' }} className="mt-1">✓</span>
+            <span style={{ color: '#5cb85c' }} className="mt-1">✓</span>
             <span>
               {language === 'de'
                 ? 'Ausgefülltes Anmeldeformular'
@@ -117,7 +117,7 @@ export function DecisionHub({ onSelectPath }: DecisionHubProps) {
             {showInfoModal === 'appointment' ? (
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#E60032' }}>
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#d82020' }}>
                     <Calendar className="w-6 h-6 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold" style={{ color: '#000000' }}>
@@ -178,9 +178,9 @@ export function DecisionHub({ onSelectPath }: DecisionHubProps) {
                   </div>
                   <div 
                     className="p-4 rounded-lg"
-                    style={{ backgroundColor: 'rgba(230, 0, 50, 0.05)', border: '1px solid #E60032' }}
+                    style={{ backgroundColor: 'rgba(216, 32, 32, 0.05)', border: '1px solid #d82020' }}
                   >
-                    <h3 className="font-semibold mb-2" style={{ color: '#E60032' }}>
+                    <h3 className="font-semibold mb-2" style={{ color: '#d82020' }}>
                       {language === 'de' ? 'Wichtig:' : 'Important:'}
                     </h3>
                     <p>
@@ -196,9 +196,9 @@ export function DecisionHub({ onSelectPath }: DecisionHubProps) {
             <button
               onClick={() => setShowInfoModal(null)}
               className="mt-6 w-full py-3 text-white font-semibold rounded transition-colors"
-              style={{ backgroundColor: '#002A4E' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#001A30'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#002A4E'}
+              style={{ backgroundColor: '#003063' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#002550'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#003063'}
             >
               {language === 'de' ? 'Verstanden' : 'Got it'}
             </button>

@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Building2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Building2, Calendar } from 'lucide-react';
 import { OfficeCard } from './OfficeCard';
 import { useLanguage } from '../lib/LanguageContext';
 
 interface DistrictAccordionProps {
   selectedOffice: string | null;
-  onSelectOffice: (officeId: string, officeData?: {
+  onSelectOffice: (officeId: string | null, officeData?: {
     nextAvailable: string;
     availableSlots: number;
     name: string;
     address: string;
-  }) => void;
+  } | null) => void;
 }
 
 interface Office {
@@ -30,7 +30,62 @@ interface District {
 
 export function DistrictAccordion({ selectedOffice, onSelectOffice }: DistrictAccordionProps) {
   const [expandedDistrict, setExpandedDistrict] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>('');
   const { t } = useLanguage();
+
+  // Helper to get actual date from relative label
+  const getActualDate = (relativeDate: string): string => {
+    const today = new Date();
+    if (relativeDate.toLowerCase().includes('today') || relativeDate.toLowerCase().includes('heute')) {
+      return today.toISOString().split('T')[0];
+    } else if (relativeDate.toLowerCase().includes('tomorrow') || relativeDate.toLowerCase().includes('morgen')) {
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      return tomorrow.toISOString().split('T')[0];
+    } else if (relativeDate.toLowerCase().includes('day after') || relativeDate.toLowerCase().includes('übermorgen')) {
+      const dayAfter = new Date(today);
+      dayAfter.setDate(today.getDate() + 2);
+      return dayAfter.toISOString().split('T')[0];
+    }
+    return today.toISOString().split('T')[0];
+  };
+
+  // Helper to format date for display
+  const formatDateDisplay = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
+  };
+
+  // Get minimum and maximum dates for date picker (today to 30 days from now)
+  const getMinMaxDates = () => {
+    const today = new Date();
+    const minDate = today.toISOString().split('T')[0];
+    const maxDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    return { minDate, maxDate };
+  };
+
+  // Check if an office is available on the selected date
+  const isOfficeAvailableOnDate = (office: Office, dateStr: string): boolean => {
+    if (!dateStr || office.availableSlots === 0) return false;
+    
+    // For this demo, offices are available if their next available date is before or equal to selected date
+    const officeDate = getActualDate(office.nextAvailable);
+    return officeDate <= dateStr;
+  };
+
+  // Filter offices by selected date
+  const getFilteredDistricts = (): District[] => {
+    if (!selectedDate) return districts;
+    
+    return districts.map(district => ({
+      ...district,
+      offices: district.offices.filter(office => isOfficeAvailableOnDate(office, selectedDate))
+    }));
+  };
+
+  const toggleDistrict = (districtName: string) => {
+    setExpandedDistrict(expandedDistrict === districtName ? null : districtName);
+  };
 
   const districts: District[] = [
     {
@@ -579,21 +634,49 @@ export function DistrictAccordion({ selectedOffice, onSelectOffice }: DistrictAc
     }
   ];
 
-  const toggleDistrict = (districtName: string) => {
-    setExpandedDistrict(expandedDistrict === districtName ? null : districtName);
-  };
-
   return (
     <section>
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-6">
         <Building2 className="w-5 h-5 text-gray-700" />
         <h2 className="text-xl font-semibold text-gray-900">
           {t.allOffices.title}
         </h2>
       </div>
 
+      {/* Date Filter Section */}
+      <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+        <div className="flex items-center gap-3">
+          <Calendar className="w-5 h-5 text-gray-600" />
+          <label htmlFor="date-filter" className="font-medium text-gray-700">
+            Filter by appointment date:
+          </label>
+          <input
+            id="date-filter"
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            min={getMinMaxDates().minDate}
+            max={getMinMaxDates().maxDate}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {selectedDate && (
+            <div className="ml-auto flex items-center gap-2">
+              <span className="text-sm text-gray-600">
+                Selected: {formatDateDisplay(selectedDate)}
+              </span>
+              <button
+                onClick={() => setSelectedDate('')}
+                className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+              >
+                Clear
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="space-y-3">
-        {districts.map((district) => (
+        {getFilteredDistricts().map((district) => (
           <div key={district.name} className="border border-gray-200 rounded-lg bg-white overflow-hidden">
             {/* Accordion Header */}
             <button
@@ -607,20 +690,24 @@ export function DistrictAccordion({ selectedOffice, onSelectOffice }: DistrictAc
                 <div className="text-left">
                   <h3 className="font-semibold text-gray-900">{district.name}</h3>
                   <p className="text-sm text-gray-600">
-                    {district.officeCount} {district.officeCount === 1 ? t.allOffices.officeCount : t.allOffices.officesCount}
+                    {selectedDate && district.offices.length === 0 
+                      ? `No offices available on ${formatDateDisplay(selectedDate)}`
+                      : `${district.offices.length} ${district.offices.length === 1 ? t.allOffices.officeCount : t.allOffices.officesCount}`}
                   </p>
                 </div>
               </div>
               
-              {expandedDistrict === district.name ? (
-                <ChevronUp className="w-5 h-5 text-gray-600" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-gray-600" />
+              {district.offices.length > 0 && (
+                expandedDistrict === district.name ? (
+                  <ChevronUp className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-600" />
+                )
               )}
             </button>
 
             {/* Accordion Content */}
-            {expandedDistrict === district.name && (
+            {expandedDistrict === district.name && district.offices.length > 0 && (
               <div className="border-t border-gray-200 bg-gray-50 p-4">
                 <div className="space-y-3">
                   {district.offices.map((office) => (

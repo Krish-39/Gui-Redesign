@@ -271,7 +271,7 @@ export function ContactSupport({ isOpen, onClose }: ContactSupportProps) {
                   type="submit"
                   className="w-full py-3 text-white font-semibold rounded transition-colors"
                   style={{ backgroundColor: '#E60032' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#CC0028'}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c01d1d'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#E60032'}
                 >
                   {t.support.submitMessage}

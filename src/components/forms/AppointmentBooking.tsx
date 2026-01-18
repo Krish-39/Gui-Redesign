@@ -1,30 +1,40 @@
 import React, { useState, useMemo } from 'react';
 import { useLanguage } from '../../lib/LanguageContext';
 import { Calendar, Clock, MapPin, User, Mail, Phone } from 'lucide-react';
+import { Office, OfficeWithDetails } from '../../lib/officeData';
+
+export interface AppointmentData {
+  selectedDate: string;
+  selectedTime: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+}
 
 interface AppointmentBookingProps {
   selectedOffice: string | null;
-  selectedOfficeData?: {
-    nextAvailable: string;
-    availableSlots: number;
-    name: string;
-    address: string;
-  } | null;
-  onConfirm: (appointmentData: any) => void;
+  selectedOfficeData?: Office | OfficeWithDetails | null;
+  onConfirm: (appointmentData: AppointmentData) => void;
 }
 
 export function AppointmentBooking({ selectedOffice, selectedOfficeData, onConfirm }: AppointmentBookingProps) {
   const { t } = useLanguage();
   
-  console.log('AppointmentBooking received selectedOffice:', selectedOffice);
-  console.log('AppointmentBooking received selectedOfficeData:', selectedOfficeData);
+  // Determine the initial date from office data
+  const getInitialDate = () => {
+    if ((selectedOfficeData as any)?.nextAvailableDate) {
+      return (selectedOfficeData as any).nextAvailableDate;
+    }
+    return new Date().toISOString().split('T')[0];
+  };
   
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
-    selectedDate: '',
+    selectedDate: getInitialDate(),
     selectedTime: ''
   });
 
@@ -178,19 +188,30 @@ export function AppointmentBooking({ selectedOffice, selectedOfficeData, onConfi
   // Available time slots - will be filtered based on selected office availability
   const allTimeSlots = [
     '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-    '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00'
+    '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
   ];
+
+  // Parse the specific time from nextAvailable string (e.g., "Today, 14:30" -> "14:30")
+  const parseNextAvailableTime = (nextAvailable: string | undefined): string | null => {
+    if (!nextAvailable) return null;
+    const timeMatch = nextAvailable.match(/(\d{1,2}):(\d{2})/);
+    return timeMatch ? timeMatch[0] : null;
+  };
 
   // Generate available dates based on the office's next available date
   const availableDates = useMemo(() => {
     const dates = [];
     const today = new Date();
     
-    // Parse the nextAvailable date from the office data
+    // Use nextAvailableDate if provided (from page 2), otherwise parse from nextAvailable string
     let startDate = new Date(today);
     
-    if (selectedOfficeData?.nextAvailable) {
-      const nextAvail = selectedOfficeData.nextAvailable;
+    if ((selectedOfficeData as any)?.nextAvailableDate) {
+      // Use the exact date passed from page 2
+      startDate = new Date((selectedOfficeData as any).nextAvailableDate);
+    } else if (selectedOfficeData?.nextAvailable) {
+      // Fallback: Parse the nextAvailable date string
+      const nextAvail = selectedOfficeData.nextAvailable.toLowerCase();
       if (nextAvail.includes('heute') || nextAvail.includes('today')) {
         startDate = new Date(today);
       } else if (nextAvail.includes('morgen') || nextAvail.includes('tomorrow')) {
@@ -199,6 +220,13 @@ export function AppointmentBooking({ selectedOffice, selectedOfficeData, onConfi
       } else if (nextAvail.includes('übermorgen') || nextAvail.includes('day after')) {
         startDate = new Date(today);
         startDate.setDate(today.getDate() + 2);
+      } else {
+        // Try to parse other formats (e.g., "3 days" or specific dates)
+        const daysMatch = nextAvail.match(/(\d+)\s*(day|tag)/);
+        if (daysMatch) {
+          startDate = new Date(today);
+          startDate.setDate(today.getDate() + parseInt(daysMatch[1]));
+        }
       }
     }
     
@@ -213,18 +241,31 @@ export function AppointmentBooking({ selectedOffice, selectedOfficeData, onConfi
 
   // Get available time slots based on office data
   const availableTimeSlots = useMemo(() => {
-    if (!selectedOfficeData || selectedOfficeData.availableSlots === 0) {
+    if (!selectedOfficeData) {
       return allTimeSlots;
     }
     
-    // If office has limited slots, reduce available time slots proportionally
-    const slotsCount = selectedOfficeData.availableSlots;
+    const slotsCount = selectedOfficeData.availableSlots || 0;
+    const nextTime = parseNextAvailableTime(selectedOfficeData.nextAvailable);
     
-    if (slotsCount <= 3) {
-      return allTimeSlots.slice(0, 3);
-    } else if (slotsCount <= 6) {
-      return allTimeSlots.slice(0, 6);
+    // If we have a specific next available time, start from that time
+    if (nextTime && slotsCount > 0) {
+      const timeIndex = allTimeSlots.indexOf(nextTime);
+      if (timeIndex !== -1) {
+        // Return slots starting from the next available time
+        return allTimeSlots.slice(timeIndex, timeIndex + slotsCount);
+      }
     }
+    
+    // If office has limited slots, show that many slots
+    if (slotsCount > 0 && slotsCount <= 3) {
+      return allTimeSlots.slice(0, 3);
+    } else if (slotsCount > 0 && slotsCount <= 6) {
+      return allTimeSlots.slice(0, 6);
+    } else if (slotsCount > 0) {
+      return allTimeSlots.slice(0, Math.min(slotsCount, allTimeSlots.length));
+    }
+    
     return allTimeSlots;
   }, [selectedOfficeData]);
 
@@ -251,72 +292,54 @@ export function AppointmentBooking({ selectedOffice, selectedOfficeData, onConfi
         </div>
       </section>
 
-      {/* Date and Time Selection */}
+      {/* Time Selection */}
       <section className="bg-white rounded-lg border p-6" style={{ borderColor: '#CCCCCC', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)' }}>
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#E60032' }}>
-            <Calendar className="w-5 h-5 text-white" />
+            <Clock className="w-5 h-5 text-white" />
           </div>
           <h3 className="text-xl font-bold" style={{ color: '#000000' }}>
-            {t.appointment.selectDateTime}
+            {t.appointment.selectTime}
           </h3>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-semibold mb-2" style={{ color: '#333333' }}>
-              {t.appointment.date} <span style={{ color: '#E60032' }}>*</span>
-            </label>
-            <select
-              name="selectedDate"
-              value={formData.selectedDate}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-3 border rounded focus:outline-none focus:ring-2"
-              style={{ borderColor: '#CCCCCC' }}
-              onFocus={(e) => e.currentTarget.style.borderColor = '#002A4E'}
-              onBlur={(e) => e.currentTarget.style.borderColor = '#CCCCCC'}
-            >
-              <option value="">{t.appointment.selectDate}</option>
-              {availableDates.map((date) => {
-                const dateObj = new Date(date);
-                const formatted = dateObj.toLocaleDateString('de-DE', { 
-                  weekday: 'short', 
+        {/* Display the selected date */}
+        <div className="mb-4 p-3 bg-blue-50 rounded-lg border" style={{ borderColor: '#d82020' }}>
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4" style={{ color: '#d82020' }} />
+            <span className="text-sm font-semibold" style={{ color: '#333333' }}>
+              {t.appointment.date}: {' '}
+              <span style={{ color: '#000000' }}>
+                {new Date(formData.selectedDate).toLocaleDateString('de-DE', { 
+                  weekday: 'long', 
                   day: '2-digit', 
-                  month: '2-digit', 
+                  month: 'long', 
                   year: 'numeric' 
-                });
-                return (
-                  <option key={date} value={date}>{formatted}</option>
-                );
-              })}
-            </select>
+                })}
+              </span>
+            </span>
           </div>
+        </div>
 
-          <div>
-            <label className="block text-sm font-semibold mb-2" style={{ color: '#333333' }}>
-              {t.appointment.time} <span style={{ color: '#E60032' }}>*</span>
-            </label>
-            <select
-              name="selectedTime"
-              value={formData.selectedTime}
-              onChange={handleChange}
-              required
-              disabled={!formData.selectedDate}
-              className="w-full px-4 py-3 border rounded focus:outline-none focus:ring-2"
-              style={{ 
-                borderColor: '#CCCCCC',
-                backgroundColor: !formData.selectedDate ? '#F2F2F2' : '#FFFFFF'
-              }}
-              onFocus={(e) => e.currentTarget.style.borderColor = '#002A4E'}
-              onBlur={(e) => e.currentTarget.style.borderColor = '#CCCCCC'}
-            >
-              <option value="">{t.appointment.selectTime}</option>
-              {availableTimeSlots.map((time) => (
-                <option key={time} value={time}>{time} Uhr</option>
-              ))}
-            </select>
-          </div>
+        <div>
+          <label className="block text-sm font-semibold mb-2" style={{ color: '#333333' }}>
+            {t.appointment.time} <span style={{ color: '#E60032' }}>*</span>
+          </label>
+          <select
+            name="selectedTime"
+            value={formData.selectedTime}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 border rounded focus:outline-none focus:ring-2"
+            style={{ borderColor: '#CCCCCC' }}
+            onFocus={(e) => e.currentTarget.style.borderColor = '#002A4E'}
+            onBlur={(e) => e.currentTarget.style.borderColor = '#CCCCCC'}
+          >
+            <option value="">{t.appointment.selectTime}</option>
+            {availableTimeSlots.map((time) => (
+              <option key={time} value={time}>{time} Uhr</option>
+            ))}
+          </select>
         </div>
       </section>
 

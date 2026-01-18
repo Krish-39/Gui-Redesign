@@ -13,19 +13,39 @@ import { AppointmentBooking } from './components/forms/AppointmentBooking';
 import { OnlineRegistration } from './components/forms/OnlineRegistration';
 import { ContactSupport } from './components/support/ContactSupport';
 import { HelpCircle } from 'lucide-react';
+import { Office, OfficeWithDetails } from './lib/officeData';
 
 type Screen = 'decision' | 'office-selection' | 'details' | 'confirmation';
 type FlowType = null | 'appointment' | 'online';
+
+interface AppointmentData {
+  selectedDate: string;
+  selectedTime: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+}
+
+interface RegistrationData {
+  firstName: string;
+  lastName: string;
+  birthDate: string;
+  birthPlace: string;
+  nationality: string;
+  previousStreet: string;
+  [key: string]: string;
+}
 
 function AppContent() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('decision');
   const [flowType, setFlowType] = useState<FlowType>(null);
   const [selectedOffice, setSelectedOffice] = useState<string | null>(null);
-  const [selectedOfficeData, setSelectedOfficeData] = useState<any>(null);
+  const [selectedOfficeData, setSelectedOfficeData] = useState<Office | OfficeWithDetails | null>(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
-  const [appointmentData, setAppointmentData] = useState<any>(null);
-  const [registrationData, setRegistrationData] = useState<any>(null);
+  const [appointmentData, setAppointmentData] = useState<AppointmentData | null>(null);
+  const [registrationData, setRegistrationData] = useState<RegistrationData | null>(null);
   const { toasts, dismissToast, success, error, info } = useToast();
   const { t } = useLanguage();
   const continueButtonRef = useRef<HTMLDivElement>(null);
@@ -82,21 +102,20 @@ function AppContent() {
 
   const handleOfficeSelection = (officeId: string | null, officeData?: any) => {
     if (!officeId) return;
-    console.log('Office selected:', officeId, officeData);
     setSelectedOffice(officeId);
     if (officeData) {
       setSelectedOfficeData(officeData);
     }
     success(t.notifications.officeSelected.title, t.notifications.officeSelected.message);
-    
-    // Auto-navigate after 1.5 seconds
-    setTimeout(() => {
-      steps.forEach((step) => {
-        if (step.status === 'completed' || step.screenRoute === currentScreen) {
-          setCurrentScreen(step.screenRoute as Screen);
-        }
-      });
-    }, 1500);
+    // Auto-navigate to details page
+    setCurrentScreen('details');
+  };
+
+  const handleStepClick = (stepIndex: number) => {
+    const targetStep = steps[stepIndex];
+    if (targetStep && (targetStep.status === 'completed' || targetStep.status === 'active')) {
+      setCurrentScreen(targetStep.screenRoute as Screen);
+    }
   };
 
   const triggerError = () => {
@@ -107,7 +126,7 @@ function AppContent() {
   return (
     <>
       <div className="min-h-screen" style={{ backgroundColor: '#F2F2F2' }}>
-        <OfficialHeader />
+        <OfficialHeader onLogoClick={() => setCurrentScreen('decision')} />
 
         {/* Progress Stepper */}
         {currentScreen !== 'decision' && (
@@ -141,39 +160,8 @@ function AppContent() {
                   onSelectOffice={handleOfficeSelection}
                 />
 
-                {/* Continue Button */}
-                <div className="mt-8 flex flex-col items-center gap-4">
-                  <button
-                    onClick={() => {
-                      if (selectedOffice) {
-                        handleOfficeSelection(selectedOffice, selectedOfficeData);
-                        setCurrentScreen('details');
-                      } else {
-                        error(t.demo.selectOfficeFirst, '');
-                      }
-                    }}
-                    disabled={!selectedOffice}
-                    className="px-8 py-3 text-white font-semibold rounded transition-colors"
-                    style={{ 
-                      backgroundColor: selectedOffice ? '#E40422' : '#CCCCCC',
-                      boxShadow: selectedOffice ? '0 2px 4px rgba(228, 4, 34, 0.2)' : 'none',
-                      cursor: selectedOffice ? 'pointer' : 'not-allowed'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (selectedOffice) {
-                        e.currentTarget.style.backgroundColor = '#CC0420';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (selectedOffice) {
-                        e.currentTarget.style.backgroundColor = '#E40422';
-                      }
-                    }}
-                  >
-                    {t.demo.continueToDetails}
-                  </button>
-
-                  {/* Demo: Trigger Error */}
+                {/* Demo: Trigger Error */}
+                <div className="mt-8 flex justify-center">
                   <button
                     onClick={triggerError}
                     className="px-6 py-2 rounded transition-colors text-sm"
@@ -326,11 +314,11 @@ function AppContent() {
               <div 
                 className="rounded-lg p-6 mb-6"
                 style={{ 
-                  backgroundColor: 'rgba(228, 4, 34, 0.05)',
-                  border: '1px solid #E40422'
+                  backgroundColor: 'rgba(216, 32, 32, 0.05)',
+                  border: '1px solid #d82020'
                 }}
               >
-                <h3 className="font-bold mb-3" style={{ color: '#E40422' }}>
+                <h3 className="font-bold mb-3" style={{ color: '#d82020' }}>
                   {t.appointment.documentsTitle}
                 </h3>
                 <p className="text-sm mb-3" style={{ color: '#333333' }}>
@@ -338,15 +326,15 @@ function AppContent() {
                 </p>
                 <ul className="space-y-2 text-sm" style={{ color: '#333333' }}>
                   <li className="flex items-start gap-2">
-                    <span style={{ color: '#007256' }}>✓</span>
+                    <span style={{ color: '#5cb85c' }}>✓</span>
                     <span>{t.documents.items.passport}</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span style={{ color: '#007256' }}>✓</span>
+                    <span style={{ color: '#5cb85c' }}>✓</span>
                     <span>{t.documents.items.confirmation}</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span style={{ color: '#007256' }}>✓</span>
+                    <span style={{ color: '#5cb85c' }}>✓</span>
                     <span>{t.documents.items.form}</span>
                   </li>
                 </ul>
@@ -358,11 +346,11 @@ function AppContent() {
                   onClick={() => window.print()}
                   className="px-6 py-3 font-semibold rounded transition-colors"
                   style={{ 
-                    backgroundColor: '#003366',
+                    backgroundColor: '#003063',
                     color: '#FFFFFF'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#002244'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#003366'}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#002550'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#003063'}
                 >
                   {t.appointment.printConfirmation}
                 </button>
@@ -393,18 +381,18 @@ function AppContent() {
             <div 
               className="bg-white rounded-lg p-8 border"
               style={{ 
-                borderColor: '#007256',
-                boxShadow: '0 2px 8px rgba(0, 114, 86, 0.15)'
+                borderColor: '#5cb85c',
+                boxShadow: '0 2px 8px rgba(92, 184, 92, 0.15)'
               }}
             >
               {/* Success Icon */}
               <div 
                 className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                style={{ backgroundColor: 'rgba(0, 114, 86, 0.1)' }}
+                style={{ backgroundColor: 'rgba(92, 184, 92, 0.1)' }}
               >
                 <svg
                   className="w-8 h-8"
-                  style={{ color: '#007256' }}
+                  style={{ color: '#5cb85c' }}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -432,7 +420,7 @@ function AppContent() {
                 </h3>
                 
                 <div className="text-center mb-4">
-                  <div className="text-3xl font-mono font-bold" style={{ color: '#E40422' }}>
+                  <div className="text-3xl font-mono font-bold" style={{ color: '#d82020' }}>
                     BLN-{Math.random().toString(36).substring(2, 9).toUpperCase()}
                   </div>
                 </div>
@@ -464,14 +452,14 @@ function AppContent() {
               </div>
 
               {/* Processing Time */}
-              <div className="bg-blue-50 rounded-lg p-6 mb-6" style={{ border: '1px solid #003366' }}>
-                <h3 className="font-bold mb-3" style={{ color: '#003366' }}>
+              <div className="bg-blue-50 rounded-lg p-6 mb-6" style={{ border: '1px solid #003063' }}>
+                <h3 className="font-bold mb-3" style={{ color: '#003063' }}>
                   {t.onlineRegistration.processingTime}
                 </h3>
                 <p className="text-sm" style={{ color: '#333333' }}>
                   {t.onlineRegistration.nextStepsMessage}
                 </p>
-                <div className="mt-3 text-2xl font-bold" style={{ color: '#003366' }}>
+                <div className="mt-3 text-2xl font-bold" style={{ color: '#003063' }}>
                   5-7 {t.onlineRegistration.processingDays}
                 </div>
               </div>
@@ -482,11 +470,11 @@ function AppContent() {
                   onClick={() => window.print()}
                   className="px-6 py-3 font-semibold rounded transition-colors"
                   style={{ 
-                    backgroundColor: '#003366',
+                    backgroundColor: '#003063',
                     color: '#FFFFFF'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#002244'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#003366'}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#002550'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#003063'}
                 >
                   {t.appointment.printConfirmation}
                 </button>
@@ -523,7 +511,6 @@ function AppContent() {
         primaryAction={{
           label: t.recoveryModal.primaryAction,
           onClick: () => {
-            console.log('Retry action');
             info(t.notifications.reconnecting.title, t.notifications.reconnecting.message);
           }
         }}
@@ -544,13 +531,13 @@ function AppContent() {
       <button
         onClick={() => setShowSupportModal(true)}
         className="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all z-50"
-        style={{ backgroundColor: '#E60032' }}
+        style={{ backgroundColor: '#d82020' }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#CC0028';
+          e.currentTarget.style.backgroundColor = '#c01d1d';
           e.currentTarget.style.transform = 'scale(1.1)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#E60032';
+          e.currentTarget.style.backgroundColor = '#d82020';
           e.currentTarget.style.transform = 'scale(1)';
         }}
         aria-label={t.support.needHelp}
@@ -558,6 +545,9 @@ function AppContent() {
       >
         <HelpCircle className="w-7 h-7 text-white" />
       </button>
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </>
   );
 }

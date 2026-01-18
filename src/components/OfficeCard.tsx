@@ -21,6 +21,29 @@ export function OfficeCard({ office, isSelected, onSelect }: OfficeCardProps) {
   const { t } = useLanguage();
   const hasNoAppointments = office.availableSlots === 0;
 
+  // Helper to get actual date from relative label
+  const getActualDate = (relativeDate: string): string => {
+    const today = new Date();
+    if (relativeDate.toLowerCase().includes('today') || relativeDate.toLowerCase().includes('heute')) {
+      return today.toISOString().split('T')[0];
+    } else if (relativeDate.toLowerCase().includes('tomorrow') || relativeDate.toLowerCase().includes('morgen')) {
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      return tomorrow.toISOString().split('T')[0];
+    } else if (relativeDate.toLowerCase().includes('day after') || relativeDate.toLowerCase().includes('übermorgen')) {
+      const dayAfter = new Date(today);
+      dayAfter.setDate(today.getDate() + 2);
+      return dayAfter.toISOString().split('T')[0];
+    }
+    return today.toISOString().split('T')[0];
+  };
+
+  // Helper to format date for display
+  const formatDateDisplay = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
+  };
+
   return (
     <div
       className={`bg-white border rounded-lg p-4 transition-all ${
@@ -55,7 +78,7 @@ export function OfficeCard({ office, isSelected, onSelect }: OfficeCardProps) {
         <div className="flex items-center gap-2">
           <Calendar className={`w-4 h-4 ${hasNoAppointments ? 'text-gray-400' : 'text-green-600'}`} />
           <span className={hasNoAppointments ? 'text-gray-500' : 'text-green-700 font-medium'}>
-            {office.nextAvailable}
+            {hasNoAppointments ? office.nextAvailable : `${office.nextAvailable} (${formatDateDisplay(getActualDate(office.nextAvailable))})`}
           </span>
         </div>
 
