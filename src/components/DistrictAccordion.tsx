@@ -11,6 +11,7 @@ interface DistrictAccordionProps {
     name: string;
     address: string;
   } | null) => void;
+  selectedDate?: string;
 }
 
 interface Office {
@@ -28,9 +29,9 @@ interface District {
   offices: Office[];
 }
 
-export function DistrictAccordion({ selectedOffice, onSelectOffice }: DistrictAccordionProps) {
+export function DistrictAccordion({ selectedOffice, onSelectOffice, selectedDate: propSelectedDate }: DistrictAccordionProps) {
   const [expandedDistrict, setExpandedDistrict] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<string>(propSelectedDate || '');
   const { t } = useLanguage();
 
   // Helper to get actual date from relative label
@@ -62,29 +63,6 @@ export function DistrictAccordion({ selectedOffice, onSelectOffice }: DistrictAc
     const minDate = today.toISOString().split('T')[0];
     const maxDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     return { minDate, maxDate };
-  };
-
-  // Check if an office is available on the selected date
-  const isOfficeAvailableOnDate = (office: Office, dateStr: string): boolean => {
-    if (!dateStr || office.availableSlots === 0) return false;
-    
-    // For this demo, offices are available if their next available date is before or equal to selected date
-    const officeDate = getActualDate(office.nextAvailable);
-    return officeDate <= dateStr;
-  };
-
-  // Filter offices by selected date
-  const getFilteredDistricts = (): District[] => {
-    if (!selectedDate) return districts;
-    
-    return districts.map(district => ({
-      ...district,
-      offices: district.offices.filter(office => isOfficeAvailableOnDate(office, selectedDate))
-    }));
-  };
-
-  const toggleDistrict = (districtName: string) => {
-    setExpandedDistrict(expandedDistrict === districtName ? null : districtName);
   };
 
   const districts: District[] = [
@@ -634,6 +612,29 @@ export function DistrictAccordion({ selectedOffice, onSelectOffice }: DistrictAc
     }
   ];
 
+  // Check if an office is available on the selected date
+  const isOfficeAvailableOnDate = (office: Office, dateStr: string): boolean => {
+    if (!dateStr || office.availableSlots === 0) return false;
+    
+    // For this demo, offices are available if their next available date is before or equal to selected date
+    const officeDate = getActualDate(office.nextAvailable);
+    return officeDate <= dateStr;
+  };
+
+  // Filter offices by selected date
+  const getFilteredDistricts = (): District[] => {
+    if (!selectedDate) return districts;
+    
+    return districts.map(district => ({
+      ...district,
+      offices: district.offices.filter(office => isOfficeAvailableOnDate(office, selectedDate))
+    }));
+  };
+
+  const toggleDistrict = (districtName: string) => {
+    setExpandedDistrict(expandedDistrict === districtName ? null : districtName);
+  };
+
   return (
     <section>
       <div className="flex items-center gap-2 mb-6">
@@ -648,7 +649,7 @@ export function DistrictAccordion({ selectedOffice, onSelectOffice }: DistrictAc
         <div className="flex items-center gap-3">
           <Calendar className="w-5 h-5 text-gray-600" />
           <label htmlFor="date-filter" className="font-medium text-gray-700">
-            Filter by appointment date:
+            {t.allOffices.filterByDate}
           </label>
           <input
             id="date-filter"
@@ -668,7 +669,7 @@ export function DistrictAccordion({ selectedOffice, onSelectOffice }: DistrictAc
                 onClick={() => setSelectedDate('')}
                 className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
               >
-                Clear
+                {t.allOffices.clearFilter}
               </button>
             </div>
           )}
@@ -690,8 +691,10 @@ export function DistrictAccordion({ selectedOffice, onSelectOffice }: DistrictAc
                 <div className="text-left">
                   <h3 className="font-semibold text-gray-900">{district.name}</h3>
                   <p className="text-sm text-gray-600">
-                    {selectedDate && district.offices.length === 0 
-                      ? `No offices available on ${formatDateDisplay(selectedDate)}`
+                    {selectedDate 
+                      ? district.offices.length === 0 
+                        ? `${t.allOffices.noOfficesAvailable} (${formatDateDisplay(selectedDate)})`
+                        : `${district.offices.length} ${district.offices.length === 1 ? t.allOffices.officeCount : t.allOffices.officesCount} ${t.timeLabels.on} ${formatDateDisplay(selectedDate)}`
                       : `${district.offices.length} ${district.offices.length === 1 ? t.allOffices.officeCount : t.allOffices.officesCount}`}
                   </p>
                 </div>
@@ -715,6 +718,7 @@ export function DistrictAccordion({ selectedOffice, onSelectOffice }: DistrictAc
                       key={office.id}
                       office={office}
                       isSelected={selectedOffice === office.id}
+                      selectedDate={selectedDate}
                       onSelect={() => onSelectOffice(office.id, {
                         nextAvailable: office.nextAvailable,
                         availableSlots: office.availableSlots,

@@ -15,9 +15,10 @@ interface OfficeCardProps {
   office: Office;
   isSelected: boolean;
   onSelect: () => void;
+  selectedDate?: string;
 }
 
-export function OfficeCard({ office, isSelected, onSelect }: OfficeCardProps) {
+export function OfficeCard({ office, isSelected, onSelect, selectedDate }: OfficeCardProps) {
   const { t } = useLanguage();
   const hasNoAppointments = office.availableSlots === 0;
 
@@ -78,7 +79,12 @@ export function OfficeCard({ office, isSelected, onSelect }: OfficeCardProps) {
         <div className="flex items-center gap-2">
           <Calendar className={`w-4 h-4 ${hasNoAppointments ? 'text-gray-400' : 'text-green-600'}`} />
           <span className={hasNoAppointments ? 'text-gray-500' : 'text-green-700 font-medium'}>
-            {hasNoAppointments ? office.nextAvailable : `${office.nextAvailable} (${formatDateDisplay(getActualDate(office.nextAvailable))})`}
+            {selectedDate 
+              ? `${formatDateDisplay(selectedDate)}` 
+              : hasNoAppointments 
+                ? office.nextAvailable 
+                : `${office.nextAvailable} (${formatDateDisplay(getActualDate(office.nextAvailable))})`
+            }
           </span>
         </div>
 

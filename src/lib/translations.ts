@@ -27,6 +27,9 @@ export interface Translations {
     selected: string;
     selectButton: string;
     available: string;
+    filterByDate: string;
+    noOfficesAvailable: string;
+    clearFilter: string;
   };
   documents: {
     title: string;
@@ -57,6 +60,7 @@ export interface Translations {
     today: string;
     tomorrow: string;
     dayAfterTomorrow: string;
+    on: string;
   };
   languageSelector: {
     title: string;
@@ -156,6 +160,20 @@ export interface Translations {
     downloadConfirmation: string;
     printConfirmation: string;
     backToHome: string;
+  };
+  appointmentError: {
+    headline: string;
+    explanation: string;
+    reasonsTitle: string;
+    reasons: string[];
+    bookNewButton: string;
+    getHelpButton: string;
+    offlineOption: {
+      title: string;
+      description: string;
+      hours: string;
+      hoursDetails: string;
+    };
   };
   onlineRegistration: {
     title: string;
@@ -260,7 +278,10 @@ export const translations: Record<Language, Translations> = {
       officesCount: 'Bürgerämter',
       selected: 'Ausgewählt',
       selectButton: 'Auswählen',
-      available: 'Termine verfügbar'
+      available: 'Termine verfügbar',
+      filterByDate: 'Nach Termin filtern:',
+      noOfficesAvailable: 'Keine Bürgerämter an diesem Datum verfügbar',
+      clearFilter: 'Zurücksetzen'
     },
     documents: {
       title: 'Erforderliche Dokumente',
@@ -290,7 +311,8 @@ export const translations: Record<Language, Translations> = {
     timeLabels: {
       today: 'Heute',
       tomorrow: 'Morgen',
-      dayAfterTomorrow: 'Übermorgen'
+      dayAfterTomorrow: 'Übermorgen',
+      on: 'am'
     },
     languageSelector: {
       title: 'Sprache wählen'
@@ -394,6 +416,25 @@ export const translations: Record<Language, Translations> = {
       printConfirmation: 'Bestätigung drucken',
       backToHome: 'Zurück zur Startseite'
     },
+    appointmentError: {
+      headline: 'Wir konnten Ihren Termin nicht finden',
+      explanation: 'Leider ist bei der Buchung Ihres Termins ein Problem aufgetreten.',
+      reasonsTitle: 'Mögliche Gründe:',
+      reasons: [
+        'Die Reservierungsnummer ist ungültig oder abgelaufen',
+        'Der Termin wurde bereits von jemand anderem gebucht',
+        'Es gab ein technisches Problem bei der Buchung',
+        'Die Terminverfügbarkeit hat sich geändert'
+      ],
+      bookNewButton: 'Neuen Termin buchen',
+      getHelpButton: 'Hilfe erhalten',
+      offlineOption: {
+        title: 'Dringende Angelegenheit?',
+        description: 'Für dringende Fälle können Sie das Bürgeramt auch ohne Termin besuchen.',
+        hours: 'Öffnungszeiten ohne Termin:',
+        hoursDetails: 'Montag-Freitag: 08:00-12:00 Uhr (begrenzte Kapazität)'
+      }
+    },
     onlineRegistration: {
       title: 'Online-Anmeldung',
       subtitle: 'Bitte füllen Sie die folgenden Informationen aus',
@@ -495,7 +536,10 @@ export const translations: Record<Language, Translations> = {
       officesCount: 'offices',
       selected: 'Selected',
       selectButton: 'Select',
-      available: 'appointments available'
+      available: 'appointments available',
+      filterByDate: 'Filter by appointment date:',
+      noOfficesAvailable: 'No offices available on this date',
+      clearFilter: 'Clear'
     },
     documents: {
       title: 'Required Documents',
@@ -525,7 +569,8 @@ export const translations: Record<Language, Translations> = {
     timeLabels: {
       today: 'Today',
       tomorrow: 'Tomorrow',
-      dayAfterTomorrow: 'Day after tomorrow'
+      dayAfterTomorrow: 'Day after tomorrow',
+      on: 'on'
     },
     languageSelector: {
       title: 'Select Language'
@@ -629,6 +674,25 @@ export const translations: Record<Language, Translations> = {
       printConfirmation: 'Print Confirmation',
       backToHome: 'Back to Home'
     },
+    appointmentError: {
+      headline: 'We Could Not Find Your Appointment',
+      explanation: 'Unfortunately, there was a problem booking your appointment.',
+      reasonsTitle: 'Possible reasons:',
+      reasons: [
+        'The reservation number is invalid or has expired',
+        'The appointment was already booked by someone else',
+        'There was a technical issue during the booking process',
+        'Appointment availability has changed'
+      ],
+      bookNewButton: 'Book a New Appointment',
+      getHelpButton: 'Get Help',
+      offlineOption: {
+        title: 'Urgent Matter?',
+        description: 'For urgent cases, you can visit the Bürgeramt directly without an appointment.',
+        hours: 'Walk-in hours:',
+        hoursDetails: 'Monday-Friday: 08:00-12:00 (limited capacity)'
+      }
+    },
     onlineRegistration: {
       title: 'Online Registration',
       subtitle: 'Please fill in the following information',
@@ -730,7 +794,10 @@ export const translations: Record<Language, Translations> = {
       officesCount: 'ofis',
       selected: 'Seçildi',
       selectButton: 'Seç',
-      available: 'randevu mevcut'
+      available: 'randevu mevcut',
+      filterByDate: 'Randevu tarihine göre filtrele:',
+      noOfficesAvailable: 'Bu tarihte ofis mevcut değil',
+      clearFilter: 'Temizle'
     },
     documents: {
       title: 'Gerekli Belgeler',
@@ -760,7 +827,8 @@ export const translations: Record<Language, Translations> = {
     timeLabels: {
       today: 'Bugün',
       tomorrow: 'Yarın',
-      dayAfterTomorrow: 'Öbür gün'
+      dayAfterTomorrow: 'Öbür gün',
+      on: 'tarihinde'
     },
     languageSelector: {
       title: 'Dil Seç'
@@ -864,6 +932,25 @@ export const translations: Record<Language, Translations> = {
       printConfirmation: 'Onaylamayı Yazdırın',
       backToHome: 'Anasayfaya Geri Dön'
     },
+    appointmentError: {
+      headline: 'Randevunuzu Bulamadık',
+      explanation: 'Maalesef randevunuzu rezerve ederken bir sorun oluştu.',
+      reasonsTitle: 'Olası nedenler:',
+      reasons: [
+        'Rezervasyon numarası geçersiz veya süresi dolmuş',
+        'Randevu başka biri tarafından rezerve edilmiş',
+        'Rezervasyon sırasında teknik bir sorun yaşandı',
+        'Randevu müsaitliği değişmiş'
+      ],
+      bookNewButton: 'Yeni Randevu Al',
+      getHelpButton: 'Yardım Al',
+      offlineOption: {
+        title: 'Acil Durum?',
+        description: 'Acil durumlar için randevusuz olarak Bürgeramt\'ı ziyaret edebilirsiniz.',
+        hours: 'Randevusuz ziyaret saatleri:',
+        hoursDetails: 'Pazartesi-Cuma: 08:00-12:00 (sınırlı kapasite)'
+      }
+    },
     onlineRegistration: {
       title: 'Online Kayıt',
       subtitle: 'Lütfen aşağıdaki bilgileri doldurun',
@@ -965,7 +1052,10 @@ export const translations: Record<Language, Translations> = {
       officesCount: 'مكاتب',
       selected: 'محدد',
       selectButton: 'اختر',
-      available: 'مواعيد متاحة'
+      available: 'مواعيد متاحة',
+      filterByDate: 'تصفية حسب تاريخ الموعد:',
+      noOfficesAvailable: 'لا توجد مكاتب متاحة في هذا التاريخ',
+      clearFilter: 'مسح'
     },
     documents: {
       title: 'المستندات المطلوبة',
@@ -995,7 +1085,8 @@ export const translations: Record<Language, Translations> = {
     timeLabels: {
       today: 'اليوم',
       tomorrow: 'غدًا',
-      dayAfterTomorrow: 'بعد غد'
+      dayAfterTomorrow: 'بعد غد',
+      on: 'في'
     },
     languageSelector: {
       title: 'اختر اللغة'
@@ -1100,6 +1191,25 @@ export const translations: Record<Language, Translations> = {
       printConfirmation: 'طباعة التأكيد',
       backToHome: 'العودة إلى الصفحة الرئيسية'
     },
+    appointmentError: {
+      headline: 'لم نتمكن من العثور على موعدك',
+      explanation: 'للأسف، حدثت مشكلة في حجز موعدك.',
+      reasonsTitle: 'الأسباب المحتملة:',
+      reasons: [
+        'رقم الحجز غير صالح أو منتهي الصلاحية',
+        'تم حجز الموعد بالفعل من قبل شخص آخر',
+        'حدثت مشكلة تقنية أثناء عملية الحجز',
+        'تغيرت مدى توفر المواعيد'
+      ],
+      bookNewButton: 'حجز موعد جديد',
+      getHelpButton: 'احصل على المساعدة',
+      offlineOption: {
+        title: 'أمر عاجل؟',
+        description: 'في الحالات العاجلة، يمكنك زيارة المكتب مباشرة بدون موعد.',
+        hours: 'ساعات الزيارة بدون موعد:',
+        hoursDetails: 'الاثنين-الجمعة: 08:00-12:00 (سعة محدودة)'
+      }
+    },
     onlineRegistration: {
       title: 'تسجيل عبر الإنترنت',
       subtitle: 'يرجى ملء المعلومات التالية',
@@ -1201,7 +1311,10 @@ export const translations: Record<Language, Translations> = {
       officesCount: 'urzędy',
       selected: 'Wybrano',
       selectButton: 'Wybierz',
-      available: 'wolne terminy'
+      available: 'wolne terminy',
+      filterByDate: 'Filtruj według daty terminu:',
+      noOfficesAvailable: 'Brak dostępnych urzędów w tym dniu',
+      clearFilter: 'Wyczyść'
     },
     documents: {
       title: 'Wymagane dokumenty',
@@ -1231,7 +1344,8 @@ export const translations: Record<Language, Translations> = {
     timeLabels: {
       today: 'Dziś',
       tomorrow: 'Jutro',
-      dayAfterTomorrow: 'Pojutrze'
+      dayAfterTomorrow: 'Pojutrze',
+      on: 'w'
     },
     languageSelector: {
       title: 'Wybierz język'
@@ -1336,6 +1450,25 @@ export const translations: Record<Language, Translations> = {
       printConfirmation: 'Drukuj potwierdzenie',
       backToHome: 'Wróć do strony głównej'
     },
+    appointmentError: {
+      headline: 'Nie mogliśmy znaleźć Twojego terminu',
+      explanation: 'Niestety wystąpił problem podczas rezerwacji Twojego terminu.',
+      reasonsTitle: 'Możliwe przyczyny:',
+      reasons: [
+        'Numer rezerwacji jest nieprawidłowy lub wygasł',
+        'Termin został już zarezerwowany przez kogoś innego',
+        'Wystąpił problem techniczny podczas procesu rezerwacji',
+        'Dostępność terminów uległa zmianie'
+      ],
+      bookNewButton: 'Zarezerwuj nowy termin',
+      getHelpButton: 'Uzyskaj pomoc',
+      offlineOption: {
+        title: 'Pilna sprawa?',
+        description: 'W pilnych przypadkach możesz odwiedzić urząd bezpośrednio bez terminu.',
+        hours: 'Godziny bez terminu:',
+        hoursDetails: 'Poniedziałek-Piątek: 08:00-12:00 (ograniczona pojemność)'
+      }
+    },
     onlineRegistration: {
       title: 'Rejestracja online',
       subtitle: 'Proszę wypenić następujące informacje',
@@ -1437,7 +1570,10 @@ export const translations: Record<Language, Translations> = {
       officesCount: 'bureaux',
       selected: 'Sélectionné',
       selectButton: 'Sélectionner',
-      available: 'rendez-vous disponibles'
+      available: 'rendez-vous disponibles',
+      filterByDate: 'Filtrer par date de rendez-vous:',
+      noOfficesAvailable: 'Aucun bureau disponible à cette date',
+      clearFilter: 'Effacer'
     },
     documents: {
       title: 'Documents requis',
@@ -1467,7 +1603,8 @@ export const translations: Record<Language, Translations> = {
     timeLabels: {
       today: 'Aujourd\'hui',
       tomorrow: 'Demain',
-      dayAfterTomorrow: 'Après-demain'
+      dayAfterTomorrow: 'Après-demain',
+      on: 'le'
     },
     languageSelector: {
       title: 'Sélectionner la langue'
@@ -1571,6 +1708,25 @@ export const translations: Record<Language, Translations> = {
       downloadConfirmation: 'Télécharger la confirmation',
       printConfirmation: 'Imprimer la confirmation',
       backToHome: 'Retour à la page d\'accueil'
+    },
+    appointmentError: {
+      headline: 'Nous n\'avons pas pu trouver votre rendez-vous',
+      explanation: 'Malheureusement, un problème est survenu lors de la réservation de votre rendez-vous.',
+      reasonsTitle: 'Raisons possibles:',
+      reasons: [
+        'Le numéro de réservation est invalide ou a expiré',
+        'Le rendez-vous a déjà été réservé par quelqu\'un d\'autre',
+        'Un problème technique s\'est produit pendant la réservation',
+        'La disponibilité des rendez-vous a changé'
+      ],
+      bookNewButton: 'Réserver un nouveau rendez-vous',
+      getHelpButton: 'Obtenir de l\'aide',
+      offlineOption: {
+        title: 'Affaire urgente?',
+        description: 'Pour les cas urgents, vous pouvez visiter le Bürgeramt directement sans rendez-vous.',
+        hours: 'Heures sans rendez-vous:',
+        hoursDetails: 'Lundi-Vendredi: 08:00-12:00 (capacité limitée)'
+      }
     },
     onlineRegistration: {
       title: 'Inscription en ligne',

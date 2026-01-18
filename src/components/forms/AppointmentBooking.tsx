@@ -16,10 +16,13 @@ interface AppointmentBookingProps {
   selectedOffice: string | null;
   selectedOfficeData?: Office | OfficeWithDetails | null;
   onConfirm: (appointmentData: AppointmentData) => void;
+  onError?: () => void;
+  onBackToSelection?: () => void;
 }
 
-export function AppointmentBooking({ selectedOffice, selectedOfficeData, onConfirm }: AppointmentBookingProps) {
+export function AppointmentBooking({ selectedOffice, selectedOfficeData, onConfirm, onError, onBackToSelection }: AppointmentBookingProps) {
   const { t } = useLanguage();
+  const [bookingError, setBookingError] = useState(false);
   
   // Determine the initial date from office data
   const getInitialDate = () => {
@@ -270,6 +273,7 @@ export function AppointmentBooking({ selectedOffice, selectedOfficeData, onConfi
   }, [selectedOfficeData]);
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Selected Office Info */}
       <section className="bg-white rounded-lg border p-6" style={{ borderColor: '#CCCCCC', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)' }}>
@@ -427,7 +431,7 @@ export function AppointmentBooking({ selectedOffice, selectedOfficeData, onConfi
       </section>
 
       {/* Submit Button */}
-      <div className="flex justify-center pt-4">
+      <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
         <button
           type="submit"
           className="px-12 py-4 text-white font-bold text-lg rounded transition-colors"
@@ -447,5 +451,22 @@ export function AppointmentBooking({ selectedOffice, selectedOfficeData, onConfi
         <span style={{ color: '#E60032' }}>*</span> {t.form.requiredFields}
       </p>
     </form>
+
+    {/* Test Error Button (for demo purposes) */}
+    <div className="flex justify-center mt-8 pt-6 border-t border-gray-200">
+      <button
+        type="button"
+        onClick={() => {
+          if (onError) {
+            setBookingError(true);
+            onError();
+          }
+        }}
+        className="px-8 py-3 bg-orange-500 text-white font-semibold rounded hover:bg-orange-600 transition-colors text-sm"
+      >
+        Test Booking Error
+      </button>
+    </div>
+    </>
   );
 }

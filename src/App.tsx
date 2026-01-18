@@ -7,6 +7,7 @@ import { ProgressStepper, Step } from './components/navigation/ProgressStepper';
 import { OfficialHeader } from './components/navigation/OfficialHeader';
 import { DecisionHub } from './screens/DecisionHub';
 import { RecoveryModal } from './components/feedback/RecoveryModal';
+import { AppointmentError } from './components/feedback/AppointmentError';
 import { ToastContainer } from './components/feedback/Toast';
 import { useToast } from './lib/useToast';
 import { AppointmentBooking } from './components/forms/AppointmentBooking';
@@ -44,6 +45,7 @@ function AppContent() {
   const [selectedOfficeData, setSelectedOfficeData] = useState<Office | OfficeWithDetails | null>(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
+  const [showAppointmentError, setShowAppointmentError] = useState(false);
   const [appointmentData, setAppointmentData] = useState<AppointmentData | null>(null);
   const [registrationData, setRegistrationData] = useState<RegistrationData | null>(null);
   const { toasts, dismissToast, success, error, info } = useToast();
@@ -194,15 +196,35 @@ function AppContent() {
               </p>
             </div>
             
-            <AppointmentBooking 
-              selectedOffice={selectedOffice}
-              selectedOfficeData={selectedOfficeData}
-              onConfirm={(data) => {
-                setAppointmentData(data);
-                setCurrentScreen('confirmation');
-                success(t.notifications.formSubmitted.title, t.notifications.formSubmitted.message);
-              }}
-            />
+            {showAppointmentError ? (
+              <AppointmentError 
+                onBookNew={() => {
+                  setShowAppointmentError(false);
+                  setCurrentScreen('office-selection');
+                }}
+                onGetHelp={() => {
+                  setShowAppointmentError(false);
+                  setShowSupportModal(true);
+                }}
+              />
+            ) : (
+              <AppointmentBooking 
+                selectedOffice={selectedOffice}
+                selectedOfficeData={selectedOfficeData}
+                onConfirm={(data) => {
+                  setAppointmentData(data);
+                  setCurrentScreen('confirmation');
+                  success(t.notifications.formSubmitted.title, t.notifications.formSubmitted.message);
+                }}
+                onError={() => {
+                  setShowAppointmentError(true);
+                  error(t.appointmentError.headline, t.appointmentError.explanation);
+                }}
+                onBackToSelection={() => {
+                  setCurrentScreen('office-selection');
+                }}
+              />
+            )}
           </div>
         )}
 
@@ -274,7 +296,7 @@ function AppContent() {
                   <div className="flex justify-between">
                     <span style={{ color: '#666666' }}>{t.appointment.office}:</span>
                     <span className="font-semibold" style={{ color: '#000000' }}>
-                      Bürgeramt Mitte - Karl-Marx-Allee
+                      {selectedOfficeData?.name || 'Bürgeramt Mitte - Karl-Marx-Allee'}
                     </span>
                   </div>
                   
