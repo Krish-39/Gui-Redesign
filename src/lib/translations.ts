@@ -89,6 +89,7 @@ export interface Translations {
     appointmentDescription: string;
     onlineTitle: string;
     onlineDescription: string;
+    recommendedLabel: string;
     learnMore: string;
     whatYouNeed: string;
   };
@@ -341,6 +342,7 @@ export const translations: Record<Language, Translations> = {
       appointmentDescription: 'Wählen Sie ein Bürgeramt und buchen Sie einen persönlichen Termin für Ihre Anmeldung.',
       onlineTitle: 'Online-Anmeldung',
       onlineDescription: 'Vervollständigen Sie Ihre Anmeldung vollständig online – kein persönlicher Termin erforderlich.',
+      recommendedLabel: 'Empfohlen',
       learnMore: 'Mehr erfahren',
       whatYouNeed: 'Was Sie benötigen:'
     },
@@ -599,6 +601,7 @@ export const translations: Record<Language, Translations> = {
       appointmentDescription: 'Choose a citizen service office and book an in-person appointment for your registration.',
       onlineTitle: 'Register Online',
       onlineDescription: 'Complete your registration entirely online – no in-person appointment needed.',
+      recommendedLabel: 'Recommended',
       learnMore: 'Learn more',
       whatYouNeed: 'What you need:'
     },
@@ -857,6 +860,7 @@ export const translations: Record<Language, Translations> = {
       appointmentDescription: 'Bir vatandaşlık hizmet ofisi seçin ve kaydınızı gerçekleştirmek için bir randevu alın.',
       onlineTitle: 'Online Kayıt',
       onlineDescription: 'Kaydınızı tamamen çevrimiçi olarak tamamlayın – kişisel bir randevu gerekmez.',
+      recommendedLabel: 'Önerilen',
       learnMore: 'Daha fazla bilgi edin',
       whatYouNeed: 'Neye ihtiyacınız var:'
     },
@@ -1115,6 +1119,7 @@ export const translations: Record<Language, Translations> = {
       appointmentDescription: 'اختر مكتب خدمات المواطنين واحجز موعدًا شخصيًا لتسجيلك.',
       onlineTitle: 'التسجيل عبر الإنترنت',
       onlineDescription: 'أكمل تسجيلك تمامًا عبر الإنترنت – لا تحتاج إلى موعد شخصي.',
+      recommendedLabel: 'موصى به',
       learnMore: 'المزيد من المعلومات',
       whatYouNeed: 'ما تحتاجه:'
     },
@@ -1374,6 +1379,7 @@ export const translations: Record<Language, Translations> = {
       appointmentDescription: 'Wybierz urząd dla obywateli i zarezerwuj osobiste spotkanie na rejestrację.',
       onlineTitle: 'Rejestracja online',
       onlineDescription: 'Ukończ rejestrację całkowicie online – nie jest wymagane osobiste spotkanie.',
+      recommendedLabel: 'Polecane',
       learnMore: 'Dowiedz się więcej',
       whatYouNeed: 'Co potrzebujesz:'
     },
@@ -1633,6 +1639,7 @@ export const translations: Record<Language, Translations> = {
       appointmentDescription: 'Choisissez un bureau des services aux citoyens et réservez un rendez-vous en personne pour votre enregistrement.',
       onlineTitle: 'Enregistrement en ligne',
       onlineDescription: 'Complétez votre enregistrement entièrement en ligne – aucun rendez-vous en personne n\'est nécessaire.',
+      recommendedLabel: 'Recommandé',
       learnMore: 'En savoir plus',
       whatYouNeed: 'Ce dont vous avez besoin:'
     },

@@ -183,11 +183,19 @@ export function DecisionHub({ onSelectPath }: DecisionHubProps) {
                     <h3 className="font-semibold mb-2" style={{ color: '#d82020' }}>
                       {language === 'de' ? 'Wichtig:' : 'Important:'}
                     </h3>
-                    <p>
-                      {language === 'de' 
-                        ? 'Sie benötigen gescannte Kopien Ihrer Dokumente (PDF oder JPG Format).' 
-                        : 'You need scanned copies of your documents (PDF or JPG format).'}
-                    </p>
+                    <ul className="space-y-2">
+                      <li>
+                        <strong>{language === 'de' ? 'RP-Karte erforderlich:' : 'RP Card Required:'}</strong>{' '}
+                        {language === 'de' 
+                          ? 'Sie müssen eine gültige RP-Karte (Rundfunkbeitragskarte) besitzen, um sich online anzumelden.' 
+                          : 'You must have a valid RP card (Rundfunkbeitrag card) to register online.'}
+                      </li>
+                      <li>
+                        {language === 'de' 
+                          ? 'Sie benötigen gescannte Kopien Ihrer Dokumente (PDF oder JPG Format).' 
+                          : 'You need scanned copies of your documents (PDF or JPG format).'}
+                      </li>
+                    </ul>
                   </div>
                 </div>
               </div>

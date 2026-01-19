@@ -67,7 +67,7 @@ function DualActionCard({ card, onSelect }: DualActionCardProps) {
           style={{ backgroundColor: '#E60032' }}
         >
           <Star className="w-3 h-3 fill-current" />
-          Empfohlen
+          {t.decisionHub.recommendedLabel}
         </div>
       )}
 
