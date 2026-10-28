@@ -9,7 +9,7 @@ export interface RegistrationData {
   birthPlace: string;
   nationality: string;
   previousStreet: string;
-  [key: string]: string;
+  [key: string]: string | boolean;
 }
 
 interface OnlineRegistrationProps {

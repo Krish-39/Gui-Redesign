@@ -2,14 +2,10 @@ import React from 'react';
 import { Sparkles, Calendar, Clock, MapPin } from 'lucide-react';
 import { OfficeCard } from './OfficeCard';
 import { useLanguage } from '../lib/LanguageContext';
+import type { SelectedOfficeData } from '../lib/officeData';
 
 interface SmartSuggestionsProps {
-  onSelectOffice: (officeId: string | null, officeData?: {
-    nextAvailable: string;
-    availableSlots: number;
-    name: string;
-    address: string;
-  } | null) => void;
+  onSelectOffice: (officeId: string | null, officeData?: SelectedOfficeData | null) => void;
 }
 
 export function SmartSuggestions({ onSelectOffice }: SmartSuggestionsProps) {

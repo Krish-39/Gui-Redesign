@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useLanguage } from '../../lib/LanguageContext';
 import { Calendar, Clock, MapPin, User, Mail, Phone } from 'lucide-react';
-import { Office, OfficeWithDetails } from '../../lib/officeData';
+import { SelectedOfficeData } from '../../lib/officeData';
 
 export interface AppointmentData {
   selectedDate: string;
@@ -14,7 +14,7 @@ export interface AppointmentData {
 
 interface AppointmentBookingProps {
   selectedOffice: string | null;
-  selectedOfficeData?: Office | OfficeWithDetails | null;
+  selectedOfficeData?: SelectedOfficeData | null;
   onConfirm: (appointmentData: AppointmentData) => void;
   onError?: () => void;
   onBackToSelection?: () => void;
@@ -26,8 +26,8 @@ export function AppointmentBooking({ selectedOffice, selectedOfficeData, onConfi
   
   // Determine the initial date from office data
   const getInitialDate = () => {
-    if ((selectedOfficeData as any)?.nextAvailableDate) {
-      return (selectedOfficeData as any).nextAvailableDate;
+    if (selectedOfficeData?.nextAvailableDate) {
+      return selectedOfficeData.nextAvailableDate;
     }
     return new Date().toISOString().split('T')[0];
   };
@@ -209,9 +209,9 @@ export function AppointmentBooking({ selectedOffice, selectedOfficeData, onConfi
     // Use nextAvailableDate if provided (from page 2), otherwise parse from nextAvailable string
     let startDate = new Date(today);
     
-    if ((selectedOfficeData as any)?.nextAvailableDate) {
+    if (selectedOfficeData?.nextAvailableDate) {
       // Use the exact date passed from page 2
-      startDate = new Date((selectedOfficeData as any).nextAvailableDate);
+      startDate = new Date(selectedOfficeData.nextAvailableDate);
     } else if (selectedOfficeData?.nextAvailable) {
       // Fallback: Parse the nextAvailable date string
       const nextAvail = selectedOfficeData.nextAvailable.toLowerCase();
