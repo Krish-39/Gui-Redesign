@@ -10,6 +10,18 @@ export interface OfficeWithDetails extends Office {
   distance: string;
 }
 
+// Office data passed between screens: any office plus whatever slot details
+// the picking screen knew about.
+export interface SelectedOfficeData {
+  id?: string;
+  name: string;
+  address: string;
+  nextAvailable?: string;
+  nextAvailableDate?: string;
+  availableSlots?: number;
+  distance?: string;
+}
+
 export const ALL_OFFICES: Office[] = [
   // Mitte
   { id: 'mitte-1', name: 'Bürgeramt Mitte - Karl-Marx-Allee', address: 'Karl-Marx-Allee 31, 10178 Berlin' },

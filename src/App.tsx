@@ -11,10 +11,10 @@ import { AppointmentError } from './components/feedback/AppointmentError';
 import { ToastContainer } from './components/feedback/Toast';
 import { useToast } from './lib/useToast';
 import { AppointmentBooking } from './components/forms/AppointmentBooking';
-import { OnlineRegistration } from './components/forms/OnlineRegistration';
+import { OnlineRegistration, type RegistrationData } from './components/forms/OnlineRegistration';
 import { ContactSupport } from './components/support/ContactSupport';
 import { HelpCircle } from 'lucide-react';
-import { Office, OfficeWithDetails } from './lib/officeData';
+import type { SelectedOfficeData } from './lib/officeData';
 
 type Screen = 'decision' | 'office-selection' | 'details' | 'confirmation';
 type FlowType = null | 'appointment' | 'online';
@@ -28,21 +28,11 @@ interface AppointmentData {
   phone: string;
 }
 
-interface RegistrationData {
-  firstName: string;
-  lastName: string;
-  birthDate: string;
-  birthPlace: string;
-  nationality: string;
-  previousStreet: string;
-  [key: string]: string;
-}
-
 function AppContent() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('decision');
   const [flowType, setFlowType] = useState<FlowType>(null);
   const [selectedOffice, setSelectedOffice] = useState<string | null>(null);
-  const [selectedOfficeData, setSelectedOfficeData] = useState<Office | OfficeWithDetails | null>(null);
+  const [selectedOfficeData, setSelectedOfficeData] = useState<SelectedOfficeData | null>(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [showAppointmentError, setShowAppointmentError] = useState(false);
@@ -102,7 +92,7 @@ function AppContent() {
     }
   };
 
-  const handleOfficeSelection = (officeId: string | null, officeData?: any) => {
+  const handleOfficeSelection = (officeId: string | null, officeData?: SelectedOfficeData | null) => {
     if (!officeId) return;
     setSelectedOffice(officeId);
     if (officeData) {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Globe } from 'lucide-react';
-import { useLanguage, Language } from '../../lib/LanguageContext';
+import { useLanguage } from '../../lib/LanguageContext';
+import type { Language } from '../../lib/translations';
 
 interface OfficialHeaderProps {
   onLogoClick?: () => void;
@@ -18,44 +19,6 @@ export function OfficialHeader({ onLogoClick }: OfficialHeaderProps) {
     { code: 'fr', label: 'Français' }
   ];
 
-  const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    // Fetch the logo from Google Drive and convert to data URL
-    const loadLogo = async () => {
-      try {
-        const urls = [
-          'https://drive.google.com/uc?export=download&id=1m_oPD7fj_TAgNVGjhQ6Js4VXfBvzCbcd&confirm=t',
-          'https://lh3.googleusercontent.com/d/1m_oPD7fj_TAgNVGjhQ6Js4VXfBvzCbcd=s1000',
-          'https://drive.google.com/uc?export=view&id=1m_oPD7fj_TAgNVGjhQ6Js4VXfBvzCbcd'
-        ];
-
-        for (const url of urls) {
-          try {
-            const response = await fetch(url, {
-              mode: 'cors',
-              credentials: 'omit'
-            });
-            if (response.ok) {
-              const blob = await response.blob();
-              const reader = new FileReader();
-              reader.onloadend = () => {
-                setLogoUrl(reader.result as string);
-              };
-              reader.readAsDataURL(blob);
-              return;
-            }
-          } catch (e) {
-            // Try next URL
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load logo:', error);
-      }
-    };
-    loadLogo();
-  }, []);
-
   return (
     <header className="bg-white border-b shadow-sm" style={{ borderColor: '#E0E0E0' }}>
       <div className="max-w-7xl mx-auto h-20">
@@ -65,22 +28,18 @@ export function OfficialHeader({ onLogoClick }: OfficialHeaderProps) {
             className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
             onClick={onLogoClick}
           >
-            {logoUrl ? (
-              <img 
-                src={logoUrl}
-                alt="Custom Logo" 
-                className="h-16 object-contain"
-                style={{ maxWidth: '200px' }}
-              />
-            ) : (
-              <div className="h-12 w-12 bg-gray-300 rounded animate-pulse" />
-            )}
+            <img
+              src={`${import.meta.env.BASE_URL}berlin-logo.svg`}
+              alt="Berlin logo"
+              className="h-16 object-contain"
+              style={{ maxWidth: '200px' }}
+            />
             <div style={{ height: '40px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <h1 className="text-lg font-bold" style={{ color: '#000000' }}>
-                {t.header.title}
+                {t.header.taskTitle}
               </h1>
               <p className="text-xs" style={{ color: '#666666' }}>
-                {t.header.subtitle}
+                {t.header.location}
               </p>
             </div>
           </div>
